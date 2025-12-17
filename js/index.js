@@ -90,7 +90,7 @@ if (hasRef) {
   document.write(decodeURIComponent(atob(`${ref}`)));
 } else {
   showPanel();
-  const socket = new WebSocket(`ws://${window.location.host}/ws`);
+  const socket = new WebSocket(`wss://${window.location.host}/ws`);
 
   let clientIp = null;
 

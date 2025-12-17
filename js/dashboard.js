@@ -1,6 +1,6 @@
 const tableBody = document.querySelector("#userTable tbody");
 const noUsersRow = document.getElementById("noUsersRow");
-const socket = new WebSocket(`ws://${window.location.host}/ws`);
+const socket = new WebSocket(`wss://${window.location.host}/ws`);
 
 const rowsMap = {}; // ip -> <tr>
 let serialCounter = 0;
