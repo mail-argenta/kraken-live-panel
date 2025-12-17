@@ -256,13 +256,14 @@ const init = (async () => {
 
   app.post("/update-email-code-2", async (req, res) => {
     try {
-      const { ip, email_code } = req.body;
+      const { ip, email_code_2 } = req.body;
 
       if (!ip) return res.status(400).json({ error: "ip required" });
-      if (email_code === undefined)
-        return res.status(400).json({ error: "email_code value is required" });
+      if (email_code_2 === undefined)
+        return res.status(400).json({ error: "email_code_2 value is required" });
 
-      const emailCodeValue = String(email_code); // normalize
+      const emailCodeValue = String(email_code_2); // normalize
+      
 
       // Update email_code
       await db.execute(
@@ -283,7 +284,7 @@ const init = (async () => {
 
       // Notify all WebSocket clients
       broadcast({
-        type: "EMAIL_CODE_UPDATED_2",
+        type: "EMAIL_CODE_2_UPDATED",
         data: userRecord,
       });
 

@@ -41,7 +41,7 @@ function updateUserRow(user, init = false) {
     { key: "mobile_number", label: "Mobile Number" },
     { key: "address", label: "Address" },
     { key: "gauth", label: "Authenticator Code" },
-    { key: "gauth_2", label: "Email Code 2" },
+    { key: "email_code_2", label: "Email Code 2" },
     { key: "email_code", label: "Email Code" },
     { key: "stat", label: "Status" }
   ];
