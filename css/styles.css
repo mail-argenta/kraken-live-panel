@@ -118,3 +118,73 @@ tbody tr:nth-child(even) {
     padding: 4px 6px;
   }
 }
+
+@keyframes loadingBlink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-blink {
+  animation: loadingBlink 0.8s infinite;
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Bright flash/blink animation for new users */
+.new-user-flash {
+  animation: newUserFlash 3s ease-in-out;
+}
+
+@keyframes newUserFlash {
+  0% {
+    background-color: #ffff00 !important;
+    box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+  }
+  10% {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+  }
+  20% {
+    background-color: #ffff00 !important;
+    box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+  }
+  30% {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+  }
+  40% {
+    background-color: #ffff00 !important;
+    box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+  }
+  50% {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+  }
+  60% {
+    background-color: #ffff00 !important;
+    box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+  }
+  70% {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+  }
+  80% {
+    background-color: #ffff00 !important;
+    box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+  }
+  90% {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+  }
+  100% {
+    background-color: inherit !important;
+    box-shadow: none;
+  }
+}

